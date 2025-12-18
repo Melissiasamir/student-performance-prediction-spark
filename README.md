@@ -18,18 +18,18 @@ project student-performance-prediction/
 │
 ├─ data/
 │ ├─ raw/ # Original/raw datasets
-│ │ └─ student_performance_updated_1000.csv
+│ │ └─ student_performance_updated_1000.csv<br>
 │ └─ cleaned/ # Cleaned/processed datasets (for modeling)
-│ └─ student_performance_cleaned/
+│ └─ student_performance_cleaned/<br>
 │
 ├─ notebooks/
-│ └─ student_performance.ipynb # EDA & Data Cleaning notebook
+│ └─ student_performance.ipynb # EDA & Data Cleaning notebook<br>
 │
 ├─ src/
-│ └─ model.py # ML modeling, training, evaluation
+│ └─ model.py # ML modeling, training, evaluation<br>
 │
-├─ .gitignore
-├─ README.md
+├─ .gitignore<br>
+├─ README.md<br>
 └─ requirements.txt
 
 
