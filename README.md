@@ -14,23 +14,23 @@ We use student demographic and academic data to classify or predict performance 
 
 ## Project Structure
 
-project student-performance-prediction/<br>
+project student-performance-prediction/
 │
-├─ data/<br>
-│  ├─ raw/<br>               # Original / raw datasets
-│  │   └─ student_performance_updated_1000.csv<br>
+├─ data/
+│  ├─ raw/               # Original / raw datasets
+│  │   └─ student_performance_updated_1000.csv
 │  │
-│  └─ cleaned/<br>           # Cleaned / processed datasets (ready for modeling)
-│      └─ student_performance_cleaned.csv<br>
+│  └─ cleaned/           # Cleaned / processed datasets (ready for modeling)
+│      └─ student_performance_cleaned.csv
 │
-├─ notebooks/<br>
-│  └─ student_performance.ipynb<br>   # EDA & Data Cleaning notebook
+├─ notebooks/
+│  └─ student_performance.ipynb   # EDA & Data Cleaning notebook
 │
-├─ src/<br>
-│  └─ model.py<br>                # ML modeling, training, evaluation
+├─ src/
+│  └─ model.py                   # ML modeling, training, evaluation
 │
-├─ .gitignore<br>
-├─ README.md<br>
+├─ .gitignore
+├─ README.md
 └─ requirements.txt
 
 
