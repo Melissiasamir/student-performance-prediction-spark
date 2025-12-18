@@ -48,11 +48,4 @@ We use student demographic and academic data to classify or predict performance 
 2. **Preprocessing & ML Modeling** → handled in `src/model.py` by Bassant.  
 3. **Deployment & Documentation** → handled by Makady.  
 
----
-
-## Notes
-- Numerical columns are cleaned using median imputation and outlier capping (IQR).  
-- Categorical columns are cleaned using mode imputation.  
-- Cleaned dataset is stored in `data/cleaned/student_performance_cleaned`.  
-- All ML preprocessing, training, evaluation, and model selection happens in `src/model.py`.  
 
