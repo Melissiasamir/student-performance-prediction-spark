@@ -14,9 +14,9 @@ We use student demographic and academic data to classify or predict performance 
 
 ## Project Structure
 
-project student-performance-prediction/
+project student-performance-prediction/<br>
 │
-├─ data/
+├─ data/<br>
 │ ├─ raw/ # Original/raw datasets
 │ │ └─ student_performance_updated_1000.csv<br>
 │ └─ cleaned/ # Cleaned/processed datasets (for modeling)
