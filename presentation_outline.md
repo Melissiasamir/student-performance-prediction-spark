@@ -190,5 +190,5 @@ style: |
 
 **Team:** Melissia · Nadine · Bassant · Makady
 
-**GitHub:** [Repository Link]
+**GitHub:** https://github.com/Melissiasamir/student-performance-prediction-spark
 **Demo:** [Streamlit Cloud Link]
