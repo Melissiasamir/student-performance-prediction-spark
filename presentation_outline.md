@@ -19,22 +19,17 @@ style: |
 # Student Performance Prediction
 ## Using Apache Spark & Machine Learning
 
-**Big Data Classification Project**
-
-**Team:** Melissia | Nadine | Bassant | Makady
-
 ---
 
 # Problem Statement
 
 ### The Challenge
-- Schools struggle to identify **at-risk students** early
-- Teachers can't monitor every student individually
-- Late intervention leads to **poor outcomes**
+- Teachers can't monitor every student
+- Hard to identify **at-risk students** early
 
 ### Our Solution
-- Use **ML** to predict performance BEFORE exams
-- Enable **early intervention** for struggling students
+- Predicts performance BEFORE exams
+- Enables **early intervention**
 
 ---
 
@@ -45,11 +40,11 @@ style: |
 | Metric | Value |
 |--------|-------|
 | Records | 1,000 students |
-| Features | 12 → 13 (after cleaning) |
+| Features | 13 |
 
-### Key Features
+<!-- ### Key Features
 `AttendanceRate` · `StudyHoursPerWeek` · `PreviousGrade`
-`ParentalSupport` · `ExtracurricularActivities` · `FinalGrade`
+`ParentalSupport` · `ExtracurricularActivities` · `FinalGrade` -->
 
 ---
 
@@ -80,8 +75,6 @@ style: |
 | **Medium** | FinalGrade 70-84 |
 | **Low** | FinalGrade < 70 |
 
-**Tools Used:** PySpark, Pandas
-
 ---
 
 # Exploratory Data Analysis
@@ -100,7 +93,7 @@ style: |
 
 ---
 
-# Feature Engineering
+# Data Preparation
 
 ### Encoding
 - Gender: Male/Female → 0/1
@@ -118,11 +111,9 @@ style: |
 
 | Model | Pros | Cons |
 |-------|------|------|
-| **Decision Tree** | Simple, interpretable | Overfitting |
-| **Random Forest** | Better accuracy, feature importance | Slower |
 | **Logistic Regression** | Fast, good baseline | Less flexible |
-
-**Framework:** Spark MLlib / Scikit-learn
+| **Decision Tree** | Simple, interpretable | Overfitting |
+| **Random Forest** | Better accuracy | Slower |
 
 ---
 
@@ -145,6 +136,18 @@ style: |
 
 ---
 
+# Confusion Matrix
+
+*[Insert confusion matrix heatmap]*
+
+| Class | Precision | Recall |
+|-------|-----------|--------|
+| High | __% | __% |
+| Medium | __% | __% |
+| Low | __% | __% |
+
+---
+
 # Feature Importance
 
 ### Top Predictive Features
@@ -161,21 +164,13 @@ style: |
 
 # Streamlit Web App
 
-### Features
-
-| Page | Description |
-|------|-------------|
-| **Prediction** | Input data → Get prediction |
-| **Data Exploration** | Browse dataset & charts |
-| **Model Info** | Feature importance & metrics |
-
 *[Insert screenshot]*
 
 **Demo:** [Streamlit Cloud URL]
 
 ---
 
-# Key Findings
+<!-- # Key Findings
 
 ### Results
 - ML predicts performance with **__%** accuracy
@@ -187,15 +182,7 @@ style: |
 2. Encourage 17+ hrs/week study
 3. Involve parents in support
 
----
-
-# Limitations
-
-- Dataset: only 1,000 students
-- May not generalize to all schools
-- External factors not captured
-
----
+--- -->
 
 # Thank You!
 
@@ -205,33 +192,3 @@ style: |
 
 **GitHub:** [Repository Link]
 **Demo:** [Streamlit Cloud Link]
-
----
-
-# Bonus: Architecture
-
-```
-Raw Data (CSV)
-      ↓
-Data Cleaning (PySpark)
-      ↓
-Feature Engineering
-      ↓
-Model Training (Random Forest)
-      ↓
-Streamlit Web App
-      ↓
-Deployment (Streamlit Cloud)
-```
-
----
-
-# Bonus: Confusion Matrix
-
-*[Insert confusion matrix heatmap]*
-
-| Class | Precision | Recall |
-|-------|-----------|--------|
-| High | __% | __% |
-| Medium | __% | __% |
-| Low | __% | __% |
