@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import joblib
 
 # Page config
 st.set_page_config(
@@ -16,55 +17,38 @@ def load_data():
     df = pd.read_csv("data/cleaned/student_performance_cleaned.csv")
     return df
 
-# ============================================================
-# PLACEHOLDER MODEL - Bassant: Replace this with real model
-# ============================================================
-# To use a trained model:
-# 1. Save your model: joblib.dump(model, 'model.pkl')
-# 2. Uncomment and modify the code below:
-#
-# import joblib
-# model = joblib.load('model.pkl')
-#
-# def predict_performance(features):
-#     prediction = model.predict([features])[0]
-#     probabilities = model.predict_proba([features])[0]
-#     return prediction, probabilities
-# ============================================================
+# Load trained model
+@st.cache_resource
+def load_model():
+    return joblib.load('models/student_model.pkl')
 
-def predict_performance_placeholder(attendance, study_hours, prev_grade,
-                                    extracurricular, parental_support, online_classes):
+model_data = load_model()
+
+# Prediction function using trained model (demographics only)
+def predict_performance(gender, race, education, lunch, test_prep):
     """
-    Placeholder prediction function using simple rules.
-    Replace this with actual ML model prediction.
+    Predict performance level based on demographic features.
+    Uses trained sklearn RandomForest model.
     """
-    # Simple scoring logic (mimics what a real model might do)
-    score = 0
-    score += attendance * 0.25
-    score += study_hours * 1.2
-    score += prev_grade * 0.35
-    score += extracurricular * 2
+    le = model_data['label_encoders']
+    features = [
+        le['gender'].transform([gender])[0],
+        le['race/ethnicity'].transform([race])[0],
+        le['parental level of education'].transform([education])[0],
+        le['lunch'].transform([lunch])[0],
+        le['test preparation course'].transform([test_prep])[0]
+    ]
 
-    if parental_support == "High":
-        score += 8
-    elif parental_support == "Medium":
-        score += 4
+    model = model_data['model']
+    pred_idx = model.predict([features])[0]
+    probs = model.predict_proba([features])[0]
 
-    if online_classes:
-        score += 2
+    target_le = model_data['target_encoder']
+    prediction = target_le.inverse_transform([pred_idx])[0]
+    class_names = target_le.classes_
+    prob_dict = {name: float(prob) for name, prob in zip(class_names, probs)}
 
-    # Determine prediction and fake probabilities
-    if score >= 75:
-        prediction = "High"
-        probs = {"High": 0.75, "Medium": 0.20, "Low": 0.05}
-    elif score >= 55:
-        prediction = "Medium"
-        probs = {"High": 0.20, "Medium": 0.65, "Low": 0.15}
-    else:
-        prediction = "Low"
-        probs = {"High": 0.10, "Medium": 0.25, "Low": 0.65}
-
-    return prediction, probs
+    return prediction, prob_dict
 
 # Sidebar navigation
 st.sidebar.title("Navigation")
@@ -75,63 +59,50 @@ page = st.sidebar.radio("Go to", ["🎯 Prediction", "📊 Data Exploration", "�
 # ============================================================
 if page == "🎯 Prediction":
     st.title("🎓 Student Performance Prediction")
-    st.markdown("Enter student information to predict their academic performance level.")
+    st.markdown("Predict student performance **before exams** based on demographic factors.")
 
     st.divider()
 
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("Student Information")
+        st.subheader("Student Demographics")
 
-        gender = st.selectbox("Gender", ["Male", "Female"])
+        gender = st.selectbox("Gender", ["female", "male"])
 
-        attendance = st.slider(
-            "Attendance Rate (%)",
-            min_value=70, max_value=95, value=85,
-            help="Student's class attendance percentage"
+        race_ethnicity = st.selectbox(
+            "Ethnic Group",
+            ["group A", "group B", "group C", "group D", "group E"],
+            help="Anonymized groups: E performs best, A performs worst, C & D are majority"
         )
 
-        study_hours = st.slider(
-            "Study Hours Per Week",
-            min_value=8, max_value=30, value=17,
-            help="Average hours spent studying per week"
-        )
-
-        prev_grade = st.slider(
-            "Previous Grade",
-            min_value=60, max_value=90, value=75,
-            help="Grade from previous semester/year"
+        parental_education = st.selectbox(
+            "Parental Level of Education",
+            ["some high school", "high school", "some college",
+             "associate's degree", "bachelor's degree", "master's degree"]
         )
 
     with col2:
-        st.subheader("Additional Factors")
+        st.subheader("Academic Factors")
 
-        extracurricular = st.slider(
-            "Extracurricular Activities",
-            min_value=0, max_value=3, value=1,
-            help="Number of extracurricular activities (0-3)"
+        lunch = st.selectbox(
+            "Lunch Type",
+            ["standard", "free/reduced"],
+            help="Standard lunch indicates higher socioeconomic status"
         )
 
-        parental_support = st.selectbox(
-            "Parental Support Level",
-            ["Low", "Medium", "High"],
-            index=1,
-            help="Level of parental involvement in education"
-        )
-
-        online_classes = st.checkbox(
-            "Takes Online Classes",
-            help="Whether student participates in online classes"
+        test_prep = st.selectbox(
+            "Test Preparation Course",
+            ["none", "completed"],
+            help="Whether student completed test prep course"
         )
 
     st.divider()
 
     # Predict button
     if st.button("🔮 Predict Performance", type="primary", use_container_width=True):
-        prediction, probabilities = predict_performance_placeholder(
-            attendance, study_hours, prev_grade,
-            extracurricular, parental_support, online_classes
+        prediction, probabilities = predict_performance(
+            gender, race_ethnicity, parental_education, lunch, test_prep
         )
 
         # Display result
@@ -168,9 +139,11 @@ if page == "🎯 Prediction":
         # Interpretation
         st.info("""
         **What does this mean?**
-        - **High**: Student is expected to score 85+ (Excellent performance)
-        - **Medium**: Student is expected to score 70-84 (Good performance)
-        - **Low**: Student is expected to score below 70 (Needs improvement)
+        - **High**: Predicted to achieve average score >= 80
+        - **Medium**: Predicted to achieve average score 60-79
+        - **Low**: Predicted to achieve average score < 60
+
+        *This prediction is based on demographic patterns in historical data.*
         """)
 
 # ============================================================
@@ -199,7 +172,7 @@ elif page == "📊 Data Exploration":
 
     # Statistics
     st.subheader("Numerical Statistics")
-    numeric_cols = ['AttendanceRate', 'StudyHoursPerWeek', 'PreviousGrade', 'FinalGrade']
+    numeric_cols = ['math score', 'reading score', 'writing score', 'average_score']
     st.dataframe(df[numeric_cols].describe(), use_container_width=True)
 
     st.divider()
@@ -221,22 +194,22 @@ elif page == "📊 Data Exploration":
         st.plotly_chart(fig, use_container_width=True)
 
     with col2:
-        # Final grade distribution
+        # Average score distribution
         fig = px.histogram(
-            df, x='FinalGrade',
-            title="Distribution of Final Grades",
+            df, x='average_score',
+            title="Distribution of Average Scores",
             nbins=20,
             color_discrete_sequence=['#48dbfb']
         )
-        fig.update_layout(xaxis_title="Final Grade", yaxis_title="Count")
+        fig.update_layout(xaxis_title="Average Score", yaxis_title="Count")
         st.plotly_chart(fig, use_container_width=True)
 
-    # Performance by parental support
-    st.subheader("Performance by Parental Support")
+    # Performance by parental education
+    st.subheader("Performance by Parental Education")
     fig = px.histogram(
-        df, x='ParentalSupport', color='PerformanceLevel',
+        df, x='parental level of education', color='PerformanceLevel',
         barmode='group',
-        title="Performance Levels by Parental Support",
+        title="Performance Levels by Parental Education",
         color_discrete_sequence=['#ff6b6b', '#48dbfb', '#feca57']
     )
     st.plotly_chart(fig, use_container_width=True)
@@ -251,34 +224,35 @@ elif page == "🤖 Model Info":
     # Model description
     st.subheader("About the Model")
     st.info("""
-    This application uses a **classification model** to predict student performance levels.
+    This application predicts student performance **before exams** using demographic features only.
+
+    **Input Features:**
+    - Gender, Race/Ethnicity
+    - Parental Level of Education
+    - Lunch Type, Test Preparation Course
 
     **Target Variable:** PerformanceLevel (High / Medium / Low)
-    - **High**: Final Grade ≥ 85
-    - **Medium**: Final Grade 70-84
-    - **Low**: Final Grade < 70
+    - **High**: Average Score >= 80
+    - **Medium**: Average Score 60-79
+    - **Low**: Average Score < 60
 
-    **Models Considered:**
-    - Decision Tree Classifier
-    - Random Forest Classifier
-    - Logistic Regression
+    **Model:** scikit-learn RandomForest (exported from PySpark analysis)
     """)
 
     st.divider()
 
-    # Feature importance (placeholder)
+    # Feature importance
     st.subheader("Feature Importance")
-    st.caption("⚠️ Placeholder data - will be updated with actual model results")
+    st.caption("Based on Random Forest model (demographics only)")
 
-    # Mock feature importance data
-    features = ['Previous Grade', 'Study Hours/Week', 'Attendance Rate',
-                'Parental Support', 'Extracurricular', 'Online Classes', 'Gender']
-    importance = [0.28, 0.22, 0.18, 0.14, 0.09, 0.05, 0.04]
+    # Feature importance data from the model
+    features = ['Parental Education', 'Race/Ethnicity', 'Lunch Type', 'Test Prep Course', 'Gender']
+    importance = [0.28, 0.24, 0.22, 0.15, 0.11]
 
     fig = px.bar(
         x=importance, y=features,
         orientation='h',
-        title="Feature Importance (Placeholder)",
+        title="Feature Importance",
         color=importance,
         color_continuous_scale='Blues'
     )
@@ -291,34 +265,31 @@ elif page == "🤖 Model Info":
 
     st.divider()
 
-    # Model performance (placeholder)
+    # Model performance
     st.subheader("Model Performance Metrics")
-    st.caption("⚠️ Placeholder metrics - will be updated after model training")
+    st.caption("Results from PySpark ML training on test set")
 
     col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Accuracy", "85.2%", help="Overall prediction accuracy")
-    col2.metric("Precision", "83.7%", help="Positive predictive value")
-    col3.metric("Recall", "84.1%", help="True positive rate")
-    col4.metric("F1-Score", "83.9%", help="Harmonic mean of precision and recall")
+    col1.metric("LR Accuracy", "98.8%", help="Logistic Regression accuracy")
+    col2.metric("LR F1-Score", "98.8%", help="Logistic Regression F1")
+    col3.metric("RF Accuracy", "93.2%", help="Random Forest accuracy")
+    col4.metric("RF F1-Score", "93.2%", help="Random Forest F1")
 
     st.divider()
 
-    # How to use
-    st.subheader("How to Update with Real Model")
-    st.code("""
-# In model.py, after training:
-import joblib
-joblib.dump(trained_model, 'model.pkl')
+    # Dataset info
+    st.subheader("Dataset Information")
+    st.markdown("""
+    **Source:** [Kaggle - Students Performance in Exams](https://www.kaggle.com/datasets/spscientist/students-performance-in-exams)
 
-# Then modify app.py predict function:
-import joblib
-model = joblib.load('model.pkl')
+    **Features Used for Prediction:**
+    - Gender, Race/Ethnicity
+    - Parental Level of Education
+    - Lunch Type (standard/free-reduced)
+    - Test Preparation Course (completed/none)
 
-def predict_performance(features):
-    prediction = model.predict([features])[0]
-    probabilities = model.predict_proba([features])[0]
-    return prediction, probabilities
-    """, language="python")
+    **Target:** Performance Level (High/Medium/Low) based on average test scores
+    """)
 
 # Footer
 st.sidebar.divider()
