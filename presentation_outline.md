@@ -48,7 +48,7 @@ style: |
 
 ---
 
-# Data Cleaning
+<!-- # Data Cleaning
 
 ### Problems Found
 - No missing values in this dataset
@@ -63,7 +63,7 @@ style: |
 | Duplicates | 0 rows |
 | Score Range | Valid (0-100) |
 
----
+--- -->
 
 # Target Variable Created
 
