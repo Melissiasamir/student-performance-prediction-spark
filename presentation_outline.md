@@ -35,45 +35,45 @@ style: |
 
 # Dataset Overview
 
-**Source:** Kaggle - Student Performance Dataset
+**Source:** Kaggle - Students Performance in Exams
 
 | Metric | Value |
 |--------|-------|
 | Records | 1,000 students |
-| Features | 13 |
+| Features | 8 |
 
-<!-- ### Key Features
-`AttendanceRate` · `StudyHoursPerWeek` · `PreviousGrade`
-`ParentalSupport` · `ExtracurricularActivities` · `FinalGrade` -->
+### Key Features
+`gender` · `race/ethnicity` · `parental level of education`
+`lunch` · `test preparation course` · `math/reading/writing scores`
 
 ---
 
-# Data Cleaning (1/2)
+# Data Cleaning
 
 ### Problems Found
-- Missing values (~40-50 per column)
-- Outliers in numerical features
-- No target variable
+- No missing values in this dataset
+- No duplicate rows
+- Scores within valid 0-100 range
 
-### Solutions
+### Validation Performed
 
-| Problem | Solution |
-|---------|----------|
-| Missing (Numerical) | Median |
-| Missing (Categorical) | Mode |
-| Outliers | IQR capping |
+| Check | Result |
+|-------|--------|
+| Missing Values | 0 per column |
+| Duplicates | 0 rows |
+| Score Range | Valid (0-100) |
 
 ---
 
-# Data Cleaning (2/2)
+# Target Variable Created
 
-### Target Variable Created
+### Performance Level (based on average score)
 
-| Level | Condition |
-|-------|-----------|
-| **High** | FinalGrade ≥ 85 |
-| **Medium** | FinalGrade 70-84 |
-| **Low** | FinalGrade < 70 |
+| Level | Condition | Count |
+|-------|-----------|-------|
+| **High** | Average ≥ 80 | 198 |
+| **Medium** | Average 60-79 | 517 |
+| **Low** | Average < 60 | 285 |
 
 ---
 
@@ -83,26 +83,28 @@ style: |
 
 | Metric | Value |
 |--------|-------|
-| Avg Final Grade | 80.03 |
-| Avg Attendance | 85.6% |
-| Avg Study Hours | 17.6 hrs/week |
+| Avg Math Score | 66.09 |
+| Avg Reading Score | 69.17 |
+| Avg Writing Score | 68.05 |
 
 ### Key Findings
-- **High parental support** → better performance
-- Strong correlation: **study hours** ↔ **grades**
+- Strong correlation between all test scores (r > 0.8)
+- **Test preparation** improves performance
+- **Standard lunch** associated with higher scores
 
 ---
 
 # Data Preparation
 
 ### Encoding
-- Gender: Male/Female → 0/1
-- ParentalSupport: Low/Med/High → 0/1/2
-- OnlineClasses: False/True → 0/1
+- Gender: female/male → indexed
+- Race/Ethnicity: group A-E → one-hot encoded
+- Parental Education: 6 levels → one-hot encoded
+- Lunch: standard/free-reduced → one-hot encoded
+- Test Prep: none/completed → one-hot encoded
 
 ### Other Steps
 - **Scaling:** StandardScaler on numerical features
-- **Removed:** StudentID, Name
 - **Split:** 80% train / 20% test
 
 ---
@@ -112,8 +114,7 @@ style: |
 | Model | Pros | Cons |
 |-------|------|------|
 | **Logistic Regression** | Fast, good baseline | Less flexible |
-| **Decision Tree** | Simple, interpretable | Overfitting |
-| **Random Forest** | Better accuracy | Slower |
+| **Random Forest** | Better for complex patterns | Slower |
 
 ---
 
@@ -130,21 +131,8 @@ style: |
 
 | Model | Accuracy | F1-Score |
 |-------|----------|----------|
-| Decision Tree | __% | __% |
-| Random Forest | __% | __% |
-| Logistic Regression | __% | __% |
-
----
-
-# Confusion Matrix
-
-*[Insert confusion matrix heatmap]*
-
-| Class | Precision | Recall |
-|-------|-----------|--------|
-| High | __% | __% |
-| Medium | __% | __% |
-| Low | __% | __% |
+| Logistic Regression | 98.8% | 98.8% |
+| Random Forest | 93.2% | 93.2% |
 
 ---
 
@@ -152,37 +140,27 @@ style: |
 
 ### Top Predictive Features
 
-1. **Previous Grade** ⭐
-2. **Study Hours Per Week**
-3. **Attendance Rate**
-4. **Parental Support**
-5. **Extracurricular Activities**
+1. **Parental Education Level** (39.0%)
+2. **Race/Ethnicity** (33.0%)
+3. **Lunch Type** (11.0%)
+4. **Test Prep Course** (8.9%)
+5. **Gender** (8.0%)
 
-*[Insert bar chart]*
+---
+
+<!-- _class: invert -->
+![bg contain](feature_importance.png)
 
 ---
 
 # Streamlit Web App
 
-*[Insert screenshot]*
-
-**Demo:** [Streamlit Cloud URL]
-
 ---
 
-<!-- # Key Findings
+<!-- _class: invert -->
+![bg contain](screenshot.png)
 
-### Results
-- ML predicts performance with **__%** accuracy
-- **Previous grades** = strongest predictor
-- **Parental involvement** matters
-
-### Recommendations
-1. Monitor low-performing students early
-2. Encourage 17+ hrs/week study
-3. Involve parents in support
-
---- -->
+---
 
 # Thank You!
 
@@ -191,4 +169,3 @@ style: |
 **Team:** Melissia · Nadine · Bassant · Makady
 
 **GitHub:** https://github.com/Melissiasamir/student-performance-prediction-spark
-**Demo:** [Streamlit Cloud Link]
