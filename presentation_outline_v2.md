@@ -152,9 +152,10 @@ style: |
 
 # Streamlit Web App
 
-*[Insert screenshot]*
+---
 
-**Demo:** [Streamlit Cloud URL]
+<!-- _class: invert -->
+![bg contain](screenshot.png)
 
 ---
 
@@ -165,4 +166,3 @@ style: |
 **Team:** Melissia · Nadine · Bassant · Makady
 
 **GitHub:** https://github.com/Melissiasamir/student-performance-prediction-spark
-**Demo:** [Streamlit Cloud Link]
